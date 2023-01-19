@@ -1,4 +1,5 @@
-﻿using Mocha.Common.Serialization;
+﻿using Mocha.Common;
+using Mocha.Common.Serialization;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
@@ -60,6 +61,42 @@ public class AssetCompilerBase : IAssetCompiler
 			.Replace( "{SourcePathDir}", Path.GetDirectoryName( sourcePath ) );
 	}
 
+	/// <summary>
+	/// Invoked when an asset is being passed as it is already up to date.
+	/// </summary>
+	/// <param name="sourcePath">The path to the source asset.</param>
+	/// <param name="compiledPath">The path to the compiled asset.</param>
+	protected virtual void OnUpToDate( string sourcePath, string compiledPath )
+	{
+	}
+
+	/// <summary>
+	/// Invoked when an asset has started the compilation process.
+	/// </summary>
+	/// <param name="assetName">The name of the asset.</param>
+	/// <param name="path">The path to the source asset.</param>
+	protected virtual void OnProcessing( string assetName, string path )
+	{
+	}
+
+	/// <summary>
+	/// Invoked when an asset has successfully compiled.
+	/// </summary>
+	/// <param name="sourcePath">The path to the source asset.</param>
+	/// <param name="compiledPath">The path to the compiled asset.</param>
+	protected virtual void OnCompiled( string sourcePath, string compiledPath )
+	{
+	}
+
+	/// <summary>
+	/// Invoked when an asset has failed to compile.
+	/// </summary>
+	/// <param name="path">The path to the source asset.</param>
+	/// <param name="e">The exception attributed to the failure.</param>
+	protected virtual void OnFailed( string path, Exception? e )
+	{
+	}
+
 	/// <inheritdoc/>
 	public void CompileFile( string path ) => CompileFileAsync( path ).Wait();
 
@@ -101,12 +138,12 @@ public class AssetCompilerBase : IAssetCompiler
 			MochaFile<object> compiledFile = Serializer.Deserialize<MochaFile<object>>( await File.ReadAllBytesAsync( compiledPath ) );
 			if ( Enumerable.SequenceEqual( hash, compiledFile.AssetHash ) )
 			{
-				Log.UpToDate( path );
+				OnUpToDate( path, compiledPath );
 				return;
 			}
 		}
 
-		Log.Processing( compiler.AssetName, path );
+		OnProcessing( compiler.AssetName, path );
 
 		// Compile.
 		var input = new CompileInput()
@@ -145,10 +182,10 @@ public class AssetCompilerBase : IAssetCompiler
 					await compiledAssociatedFile.WriteAsync( associatedData );
 				}
 
-				Log.Compiled( compiledPath );
+				OnCompiled( path, compiledPath );
 				break;
 			case CompileState.Failed:
-				Log.Fail( path, result.Exception );
+				OnFailed( path, result.Exception );
 				break;
 			default:
 				throw new UnreachableException();

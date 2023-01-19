@@ -1,4 +1,5 @@
-﻿using Mocha.Common.Serialization;
+﻿using Mocha.Common;
+using Mocha.Common.Serialization;
 using System.Text.Json;
 
 namespace Mocha.AssetCompiler;

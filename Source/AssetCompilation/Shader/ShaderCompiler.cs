@@ -1,4 +1,5 @@
-﻿using Mocha.Common.Serialization;
+﻿using Mocha.Common;
+using Mocha.Common.Serialization;
 using System.Text;
 using Veldrid;
 using Veldrid.SPIRV;
@@ -21,7 +22,7 @@ public partial class ShaderCompiler : BaseCompiler
 	/// Compiles a shader from GLSL into SPIR-V using Veldrid's libshaderc bindings.
 	/// </summary>
 	/// <returns>Vulkan-compatible SPIR-V bytecode.</returns>
-	private int[] CompileShader( string shaderSource, ShaderStages shaderStage, string debugName = "temp" )
+	private static int[] CompileShader( string shaderSource, ShaderStages shaderStage, string debugName = "temp" )
 	{
 		//
 		// Prepend a preamble with GLSL version & macro definitions

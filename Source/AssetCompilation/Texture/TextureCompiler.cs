@@ -1,5 +1,6 @@
 ﻿using BCnEncoder.Encoder;
 using BCnEncoder.Shared;
+using Mocha.Common;
 using Mocha.Common.Serialization;
 using StbImageSharp;
 using System.Diagnostics;

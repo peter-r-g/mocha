@@ -1,8 +1,9 @@
 ﻿using Assimp;
+using Mocha.Common;
 
 namespace Mocha.AssetCompiler;
 
-public static class Assimp
+internal static class Assimp
 {
 	public static List<Model> GenerateModels( ModelInfo modelInfo )
 	{

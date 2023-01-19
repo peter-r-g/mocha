@@ -1,6 +1,8 @@
-﻿namespace Mocha.AssetCompiler;
+﻿using Mocha.Common;
 
-public struct TextureMetadata
+namespace Mocha.AssetCompiler;
+
+internal struct TextureMetadata
 {
 	public TextureFormat Format { get; set; } = TextureFormat.BC3;
 

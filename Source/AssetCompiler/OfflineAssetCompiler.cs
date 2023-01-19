@@ -54,6 +54,26 @@ public class OfflineAssetCompiler : AssetCompilerBase
 		Log.Results( (DateTime.Now - start) );
 	}
 
+	protected override void OnUpToDate( string sourcePath, string compiledPath )
+	{
+		Log.UpToDate( sourcePath );
+	}
+
+	protected override void OnProcessing( string assetName, string path )
+	{
+		Log.Processing( assetName, path );
+	}
+
+	protected override void OnCompiled( string sourcePath, string compiledPath )
+	{
+		Log.Compiled( compiledPath );
+	}
+
+	protected override void OnFailed( string path, Exception? e )
+	{
+		Log.Fail( path, e );
+	}
+
 	private void QueueDirectory( ref List<string> queue, string directory )
 	{
 		foreach ( var file in Directory.GetFiles( directory ) )

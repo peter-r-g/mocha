@@ -1,6 +1,8 @@
-﻿namespace Mocha.AssetCompiler;
+﻿using Mocha.Common;
 
-public class Model
+namespace Mocha.AssetCompiler;
+
+internal class Model
 {
 	public VertexInfo[] Vertices { get; set; }
 	public uint[]? Indices { get; set; }
