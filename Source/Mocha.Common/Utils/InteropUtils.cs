@@ -1,4 +1,6 @@
 ﻿using System.Collections.Concurrent;
+using System.Numerics;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace Mocha.Common;
@@ -82,56 +84,26 @@ public class MemoryContext : IDisposable
 		MemoryLogger.FreedBytes( Name, Values.Count * IntPtr.Size );
 	}
 
-	public IntPtr GetPtr( object obj )
+	public IntPtr GetPtr( IInteropArray arr ) => GetPtr( arr.GetNative() );
+	public IntPtr GetPtr( INativeGlue native ) => native.NativePtr;
+	public IntPtr GetPtr( string str ) => StringToCoTaskMemUTF8( str );
+	public IntPtr GetPtr( int i ) => i;
+	public IntPtr GetPtr( uint u ) => (IntPtr)u;
+	public IntPtr GetPtr( float f ) => (IntPtr)f;
+	public IntPtr GetPtr( bool b ) => b ? new IntPtr( 1 ) : IntPtr.Zero;
+	public IntPtr GetPtr( Enum enumValue )
 	{
-		if ( obj is IntPtr pointer )
-		{
-			return pointer;
-		}
-		else if ( obj is IInteropArray arr )
-		{
-			return GetPtr( arr.GetNative() );
-		}
-		else if ( obj is INativeGlue native )
-		{
-			return native.NativePtr;
-		}
-		else if ( obj is string str )
-		{
-			return StringToCoTaskMemUTF8( str );
-		}
-		else if ( obj is int i )
-		{
-			return (IntPtr)i;
-		}
-		else if ( obj is uint u )
-		{
-			return (IntPtr)u;
-		}
-		else if ( obj is float f )
-		{
-			return (IntPtr)f;
-		}
-		else if ( obj is bool b )
-		{
-			return b ? new IntPtr( 1 ) : IntPtr.Zero;
-		}
-		else if ( obj is Enum e )
-		{
-			return GetPtr( Convert.ToInt32( e ) );
-		}
-		else if ( obj.GetType().IsValueType )
-		{
-			var ptr = AllocHGlobal( Marshal.SizeOf( obj ) );
-			Marshal.StructureToPtr( obj, ptr, false );
-			return ptr;
-		}
-		else
-		{
-			Log.Error( $"Couldn't convert {obj} to pointer (type {obj.GetType()})" );
-		}
+		// FIXME: This will not work for enums that do not fit this size
+		return GetPtr( Convert.ToInt32( enumValue ) );
+	}
+	public IntPtr GetPtr<T>( T value ) where T : unmanaged
+	{
+		if ( value is Enum enumValue )
+			return GetPtr( enumValue );
 
-		return IntPtr.Zero;
+		var ptr = AllocHGlobal( Marshal.SizeOf<T>() );
+		Marshal.StructureToPtr( value, ptr, false );
+		return ptr;
 	}
 
 	internal string GetString( IntPtr strPtr )
