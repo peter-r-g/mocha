@@ -206,7 +206,13 @@ internal static class ManagedCodeGenerator
 				paramsAndInstance = paramsAndInstance.Prepend( new Variable( "NativePtr", "IntPtr" ) ).ToImmutableArray();
 
 			// Gather function call arguments. Make sure that we're passing in a pointer for everything
-			var paramNames = paramsAndInstance.Select( x => "ctx.GetPtr( " + x.Name + " )" );
+			var paramNames = paramsAndInstance.Select( x =>
+			{
+				if ( Utils.GetManagedType( x.Type ) == nameof( IntPtr ) )
+					return x.Name;
+
+				return "ctx.GetPtr( " + x.Name + " )";
+			} );
 
 			// Function call arguments as comma-separated string
 			var functionCallArgs = string.Join( ", ", paramNames );
@@ -333,7 +339,13 @@ internal static class ManagedCodeGenerator
 			// Spin up a MemoryContext instance
 			writer.WriteLine( $"using var ctx = new MemoryContext( \"{ns.Name}.{name}\" );" );
 
-			var paramNames = method.Parameters.Select( x => "ctx.GetPtr( " + x.Name + " )" );
+			var paramNames = method.Parameters.Select( x =>
+			{
+				if ( Utils.GetManagedType( x.Type ) == nameof( IntPtr ) )
+					return x.Name;
+
+				return "ctx.GetPtr( " + x.Name + " )";
+			} );
 			var functionCallArgs = string.Join( ", ", paramNames );
 
 			if ( returnsPointer )
