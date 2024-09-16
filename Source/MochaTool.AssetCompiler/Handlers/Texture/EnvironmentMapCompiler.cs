@@ -45,7 +45,7 @@ public partial class EnvironmentMapCompiler : BaseCompiler
 		if ( input.SourcePath?.EndsWith( ".exr", StringComparison.CurrentCultureIgnoreCase ) ?? false )
 		{
 			// Use tinyexr for exr
-			Exr.LoadFromMemory( input.SourceData.Span, out imageData, out var imageWidth, out var imageHeight );
+			Exr.LoadEXRFromMemory( input.SourceData.Span, out imageData, out var imageWidth, out var imageHeight );
 			textureFormat = new TextureInfo
 			{
 				DataWidth = (uint)imageWidth,
